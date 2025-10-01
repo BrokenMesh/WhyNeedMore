@@ -1,0 +1,14 @@
+
+
+
+.navbutton img {
+    filter: brightness(0.5);
+}
+
+.navbutton.selected {
+    color: #93b8ff;
+}
+
+.navbutton.selected img {
+    filter: brightness(0) saturate(100%) invert(60%) sepia(100%) saturate(300%) hue-rotate(190deg) brightness(1) contrast(1);
+}

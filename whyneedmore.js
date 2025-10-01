@@ -68,6 +68,7 @@ function scheduleUpdate(component) {
 
 function createElement(vnode, parent) {
     if (typeof vnode.type === "function") {
+        vnode.props.children = vnode.children
         const comp = new vnode.type(vnode.props);
         comp._parent = parent;
         comp._vnode = comp._render();

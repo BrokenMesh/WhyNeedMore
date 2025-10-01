@@ -1,3 +1,7 @@
+// ---- WhyNeedMore Router - 01.10.25 - elkordhicham@gmail.com ----
+
+import { Component, h } from "./whyneedmore.js";
+
 const routes = new Map();
 
 export function registerRoute(path, component) {
@@ -5,14 +9,17 @@ export function registerRoute(path, component) {
 }
 
 export class Router extends Component {
+    static instance = null;
+
     constructor(props) {
         super(props);
-        this.state = { currentPath: window.location.pathname };
+        this.currentPath = window.location.pathname;
         this.onPopState = this.onPopState.bind(this);
+        Router.instance = this;
     }
 
     onPopState() {
-        this.state.currentPath = window.location.pathname;
+        this.currentPath = window.location.pathname;
         this.stateHasChanged();
     }
 
@@ -26,22 +33,36 @@ export class Router extends Component {
 
     navigate(path) {
         window.history.pushState({}, "", path);
-        this.state.currentPath = path;
+        this.currentPath = path;
         this.stateHasChanged();
     }
 
     render() {
-        const ComponentClass = routes.get(this.state.currentPath) || this.props.fallback || null;
+        const ComponentClass = routes.get(this.currentPath) || this.props.fallback || null;
         return ComponentClass ? h(ComponentClass, {}) : null;
     }
 }
 
-export function Link({ to, children }) {
-    const onClick = (e) => {
+export class Link extends Component {   
+    constructor(props) {
+        super(props);
+    }
+
+    onClick(e) {
         e.preventDefault();
-        window.history.pushState({}, "", to);
+        window.history.pushState({}, "", this.props.to);
         window.dispatchEvent(new PopStateEvent("popstate"));
     };
 
-    return h("a", { href: to, onClick }, children);
+    selectStyle() {
+        if (Router.instance.currentPath === this.props.to) {
+            return (this.props.class ?? "") + " " + (this.props.activeClass ?? "");
+        }
+
+        return this.props.class ?? "";
+    }
+
+    render() {
+        return h("button", { href: this.props.to, onClick: (e) => this.onClick(e), class: this.selectStyle() }, this.props.children);
+    }
 }
